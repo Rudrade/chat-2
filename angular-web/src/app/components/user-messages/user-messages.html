@@ -1,0 +1,24 @@
+<div class="grid grid-cols-1 gap-4 m-4">
+  <h2 class="text-xl font-semibold mb-4 tracking-wider">Messages</h2>
+  <fieldset class="border-2 border-gray-200 rounded-md ps-2 py-1 flex items-center gap-2 shadow-lg">
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      width="16"
+      height="16"
+      fill="currentColor"
+      class="bi bi-search"
+      viewBox="0 0 16 16"
+      class="fill-gray-500"
+    >
+      <path
+        d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001q.044.06.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1 1 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0"
+      />
+    </svg>
+    <input type="text" placeholder="Search" class="text-gray-500" />
+  </fieldset>
+  <div>
+    @for (message of messages(); track message.id) {
+      <app-user-messages-item [data]="message" (click)="onUserClick(message)" />
+    }
+  </div>
+</div>
