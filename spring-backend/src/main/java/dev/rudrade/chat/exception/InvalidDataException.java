@@ -8,8 +8,7 @@ import java.util.Set;
 
 @Getter
 public class InvalidDataException extends RuntimeException {
-    // TODO: Explicit learn transient of this sonarqube rule
-    private final transient Set<? extends ConstraintViolation<?>> constraints;
+    private final Set<? extends ConstraintViolation<?>> constraints;
     private final String message;
 
     public InvalidDataException(Set<? extends ConstraintViolation<?>> constraints) {

@@ -2,10 +2,15 @@ import { Component, inject, signal } from '@angular/core';
 import { FormControl, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { AuthService } from '../../services/auth-service';
 import { take } from 'rxjs';
+import { translateError } from '../../util/app-util';
+import { InputTextModule } from 'primeng/inputtext';
+import { MessageModule } from 'primeng/message';
+import { ButtonModule } from 'primeng/button';
+import { Router } from '@angular/router';
 
 @Component({
   selector: 'app-login',
-  imports: [ReactiveFormsModule],
+  imports: [ReactiveFormsModule, InputTextModule, MessageModule, ButtonModule],
   templateUrl: './login.html',
   styleUrl: './login.css',
 })
@@ -16,6 +21,7 @@ export class Login {
   });
 
   private readonly authService = inject(AuthService);
+  private readonly router = inject(Router);
 
   submitting = signal<boolean>(false);
   errorMessage = signal<string | null>(null);
@@ -23,7 +29,7 @@ export class Login {
   onSubmit() {
     // Validate form
     if (this.form.invalid) {
-      this.form.markAllAsDirty();
+      this.form.markAllAsTouched();
       return;
     }
 
@@ -42,9 +48,14 @@ export class Login {
       .login(username, password)
       .pipe(take(1))
       .subscribe({
-        next: () => this.submitting.set(false),
+        next: (res) => {
+          this.submitting.set(false);
+          this.authService.setToken(res.token);
+          this.router.navigate(['/']);
+        },
         error: (err) => {
-          this.errorMessage.set(err);
+          const msg = translateError(err);
+          this.errorMessage.set(msg);
           this.submitting.set(false);
         },
       });

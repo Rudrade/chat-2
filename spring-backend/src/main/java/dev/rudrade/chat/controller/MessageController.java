@@ -11,7 +11,7 @@ import dev.rudrade.chat.dto.MessageDto;
 import dev.rudrade.chat.dto.MessageInputDto;
 
 @Controller
-public class MessageController {
+public class MessageController { // TODO: Secure this
 
     @MessageMapping("/sendMessage")
     @SendTo("/topic/messages")

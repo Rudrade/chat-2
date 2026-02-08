@@ -1,10 +1,12 @@
 import { Component, input } from '@angular/core';
 import { UserMessageItem } from '../../../models/user-message-item';
 import { DatePipe } from '@angular/common';
+import { AvatarModule } from 'primeng/avatar';
+import { AvatarGroupModule } from 'primeng/avatargroup';
 
 @Component({
   selector: 'app-user-messages-item',
-  imports: [DatePipe],
+  imports: [DatePipe, AvatarModule, AvatarGroupModule],
   templateUrl: './user-messages-item.html',
   styleUrl: './user-messages-item.css',
 })

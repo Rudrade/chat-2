@@ -17,12 +17,17 @@ public class ControllerExceptionHandler {
     @ExceptionHandler(Throwable.class)
     ResponseEntity<Error> handleThrowable(Throwable ex) {
         LOGGER.error("", ex);
-        return convert(ex, HttpStatus.INTERNAL_SERVER_ERROR);
+        return new ResponseEntity<>(new Error("Unxpected error", null), HttpStatus.INTERNAL_SERVER_ERROR);
     }
 
     @ExceptionHandler(InvalidAccessException.class)
     ResponseEntity<Error> handleInvalidAccess(InvalidAccessException ex) {
         return convert(ex, HttpStatus.FORBIDDEN);
+    }
+
+    @ExceptionHandler(UserNotFoundException.class)
+    ResponseEntity<Error> handleUserNotFound(UserNotFoundException ex) {
+        return convert(ex, HttpStatus.UNAUTHORIZED);
     }
 
     @ExceptionHandler(InvalidDataException.class)

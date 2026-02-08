@@ -1,15 +1,10 @@
 package dev.rudrade.chat.exception;
 
-public class InvalidAccessException extends RuntimeException {
+import org.springframework.security.core.AuthenticationException;
 
-    public static final String INVALID_ACCESS = "Invalid access";
-    public static final String USER_NOT_FOUND = "User not found";
+public class InvalidAccessException extends AuthenticationException {
 
     public InvalidAccessException() {
-        this(INVALID_ACCESS);
-    }
-
-    public InvalidAccessException(String message) {
-        super(message);
+        super("Invalid access");
     }
 }

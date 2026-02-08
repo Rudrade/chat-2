@@ -78,6 +78,7 @@ __screenshots__/
 .DS_Store
 Thumbs.db
 
-./angular-web/.angular/cache
-./angular-web/node_modules
-./angular-web/dist
+angular-web/.angular/cache
+angular-web/node_modules
+angular-web/dist
+
