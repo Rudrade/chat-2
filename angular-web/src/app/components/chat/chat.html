@@ -14,12 +14,19 @@
     }
   </div>
   <p-inputgroup>
-    <input pInputText placeholder="Send a message" class="bg-white" type="text" />
+    <input
+      pInputText
+      placeholder="Send a message"
+      class="bg-white"
+      type="text"
+      [(ngModel)]="message"
+    />
     <p-inputgroup-addon>
       <p-button
         icon="fa-regular fa-paper-plane"
         pTooltip="Click to send a message"
         tooltipPosition="bottom"
+        (onClick)="onMessageSend()"
       />
     </p-inputgroup-addon>
   </p-inputgroup>

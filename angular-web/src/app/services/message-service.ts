@@ -1,15 +1,19 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import { MessageSend } from '../models/message-send';
 import { Message } from '../models/message';
+import { AuthService } from './auth-service';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
-  private client: Client | null = null;
+  private readonly authService = inject(AuthService);
+
   private readonly messages = signal<Message[]>([]);
   msgs = this.messages.asReadonly();
+
+  private client: Client | null = null;
 
   connect() {
     this.disconnect();
@@ -25,6 +29,13 @@ export class MessageService {
           }
         });
       },
+      connectHeaders: {
+        Authorization: 'Bearer ' + this.authService.getToken(),
+      },
+      debug: (str) => {
+        console.log(str);
+      },
+      reconnectDelay: 30000,
     });
 
     this.client.activate();
