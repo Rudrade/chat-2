@@ -1,0 +1,1 @@
+insert into users(id, active, password, username, name) values ('29a8d960-46d2-4e55-80ab-7f6477541a78', true, '$2a$16$w.yonojJ0u2cf1LOgWlmXeSaDkiQd0ajL.3tm6Z1ueTnSHxefafse','user-2','test') on conflict (id) do nothing;
