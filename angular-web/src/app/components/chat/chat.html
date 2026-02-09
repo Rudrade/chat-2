@@ -1,8 +1,8 @@
 <div
-  class="grid grid-cols-1 grid-rows-[7%_1fr_3%] bg-gray-100 m-8 rounded-2xl p-4 h-[90%] max-h-[95%] gap-4"
+  class="grid grid-cols-1 grid-rows-[7%_1fr_3%] bg-slate-100 m-8 rounded-2xl p-4 h-[90%] max-h-[95%] gap-4"
 >
-  <div class="flex border-b-2 border-dashed border-gray-400 pb-4 gap-4">
-    <img [src]="data()?.image" alt="User" class="rounded-4xl" />
+  <div class="flex border-b-2 border-dashed border-slate-400 pb-4 gap-4">
+    <p-avatar [image]="data()?.image" size="xlarge" shape="circle" />
     <div>
       <h2 class="font-bold tracking-wider">{{ data()?.name }}</h2>
       <p class="text-xs">{{ data()?.online ? 'Online' : 'Offline' }}</p>
@@ -13,30 +13,21 @@
       <p>{{ message.text }}</p>
     }
   </div>
-  <fieldset class="flex justify-center">
+  <p-inputgroup>
     <input
+      pInputText
+      placeholder="Send a message"
+      class="bg-white"
       type="text"
-      placeholder="Type your message..."
-      class="bg-white px-2 py-0 shadow-2xl"
       [(ngModel)]="message"
     />
-    <button
-      type="button"
-      class="bg-blue-400 px-4 rounded-e-2xl shadow-2xl m-0 p-0 text-center ps-2 hover:cursor-pointer"
-      (click)="onMessageSend()"
-    >
-      <svg
-        xmlns="http://www.w3.org/2000/svg"
-        width="16"
-        height="16"
-        fill="currentColor"
-        class="bi bi-send"
-        viewBox="0 0 16 16"
-      >
-        <path
-          d="M15.854.146a.5.5 0 0 1 .11.54l-5.819 14.547a.75.75 0 0 1-1.329.124l-3.178-4.995L.643 7.184a.75.75 0 0 1 .124-1.33L15.314.037a.5.5 0 0 1 .54.11ZM6.636 10.07l2.761 4.338L14.13 2.576zm6.787-8.201L1.591 6.602l4.339 2.76z"
-        />
-      </svg>
-    </button>
-  </fieldset>
+    <p-inputgroup-addon>
+      <p-button
+        icon="fa-regular fa-paper-plane"
+        pTooltip="Click to send a message"
+        tooltipPosition="bottom"
+        (onClick)="onMessageSend()"
+      />
+    </p-inputgroup-addon>
+  </p-inputgroup>
 </div>

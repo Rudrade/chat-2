@@ -1,32 +1,35 @@
 import { Component, output, signal } from '@angular/core';
 import { UserMessageItem } from '../../models/user-message-item';
 import { UserMessagesItem } from './user-messages-item/user-messages-item';
+import { IconFieldModule } from 'primeng/iconfield';
+import { InputIconModule } from 'primeng/inputicon';
+import { InputText } from 'primeng/inputtext';
+import { FloatLabelModule } from 'primeng/floatlabel';
 
 @Component({
   selector: 'app-user-messages',
-  imports: [UserMessagesItem],
+  imports: [UserMessagesItem, IconFieldModule, InputIconModule, InputText, FloatLabelModule],
   templateUrl: './user-messages.html',
   styleUrl: './user-messages.css',
 })
 export class UserMessages {
   messages = signal<UserMessageItem[]>([
     {
-      id: '12',
-      name: 'Allen Barone',
-      online: true,
-      lastMessage: 'Hello!',
+      id: 'test',
+      name: 'John',
+      online: false,
+      lastMessage: 'Fuck this',
       time: new Date(),
-      image:
-        'https://cdn.dribbble.com/users/1944785/avatars/normal/c4f06458cb693b7d4a0ebb91199836ff.jpg?1592244019',
+      image: 'https://simons.berkeley.edu/sites/default/files/profiles/GuyHeadShot_3.jpg',
     },
     {
-      id: '45',
-      name: 'Juana Hill',
-      online: false,
-      lastMessage: 'what the fuck',
+      id: '2',
+      name: 'Smith',
+      online: true,
+      lastMessage: 'wut',
       time: new Date(),
       image:
-        'https://cdn.dribbble.com/users/78433/avatars/small/9a635e75bcad74dbaed1d6b2614ebdc7.png?1762259990',
+        'https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSAGJTMIhPARBvFdMCaZscF0LzK3s15-w6dgQ&s',
     },
   ]);
 

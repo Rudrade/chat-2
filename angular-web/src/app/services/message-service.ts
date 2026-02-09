@@ -7,9 +7,10 @@ import { Message } from '../models/message';
   providedIn: 'root',
 })
 export class MessageService {
-  private client: Client | null = null;
   private readonly messages = signal<Message[]>([]);
   msgs = this.messages.asReadonly();
+
+  private client: Client | null = null;
 
   connect() {
     this.disconnect();
@@ -25,6 +26,10 @@ export class MessageService {
           }
         });
       },
+      debug: (str) => {
+        console.log(str);
+      },
+      reconnectDelay: 30000,
     });
 
     this.client.activate();
