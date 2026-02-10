@@ -1,16 +1,28 @@
 <div
-  class="grid grid-cols-1 grid-rows-[7%_1fr_3%] bg-slate-100 m-8 rounded-2xl p-4 h-[90%] max-h-[95%] gap-4"
+  class="grid grid-cols-1 grid-rows-[7%_1fr_3%] bg-slate-100 m-8 rounded-2xl p-4 gap-4 max-h-[87vh] h-[87vh]"
 >
   <div class="flex border-b-2 border-dashed border-slate-400 pb-4 gap-4">
-    <p-avatar [image]="data()?.image" size="xlarge" shape="circle" />
+    <p-avatar [image]="data()?.image" size="xlarge" shape="circle" class="object-cover" />
     <div>
       <h2 class="font-bold tracking-wider">{{ data()?.name }}</h2>
       <p class="text-xs">{{ data()?.online ? 'Online' : 'Offline' }}</p>
     </div>
   </div>
-  <div>
-    @for (message of messages(); track $index) {
-      <p>{{ message.text }}</p>
+  <div
+    #msgContainer
+    class="flex flex-col overflow-auto scrollbar-thin scrollbar-thumb-gray-400 scrollbar-track-slate-100"
+    (scroll)="onScroll($event)"
+  >
+    @for (message of displayedMessages(); track $index) {
+      <div
+        class="mb-4 size-fit max-w-60 wrap-break-word rounded pr-4 ps-2 shadow-md ms-0 mr-2"
+        [class]="`${message.idFrom === loggedId ? 'bg-white self-start' : 'bg-sky-100 self-end'}`"
+        [tabindex]="$last ? -1 : 0"
+      >
+        <p class="m-0">
+          {{ message.text }}
+        </p>
+      </div>
     }
   </div>
   <p-inputgroup>
@@ -20,8 +32,9 @@
       class="bg-white"
       type="text"
       [(ngModel)]="message"
+      (keypress)="onKeyPress($event)"
     />
-    <p-inputgroup-addon>
+    <p-inputgroup-addon class="ms-2">
       <p-button
         icon="fa-regular fa-paper-plane"
         pTooltip="Click to send a message"

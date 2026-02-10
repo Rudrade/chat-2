@@ -1,5 +1,7 @@
 <div class="p-2 flex gap-4 group hover:bg-sky-500 rounded-2xl hover:cursor-pointer">
-  <p-avatar [image]="data().image" size="xlarge" shape="circle" />
+  @if (data().image) {
+    <p-avatar [image]="data().image" size="xlarge" shape="circle" class="object-cover" />
+  }
   <div class="content-center">
     <h6 class="font-semibold group-hover:text-white">{{ data().name }}</h6>
     <p class="text-sm text-gray-500 group-hover:text-black group-hover:font-semibold">
@@ -9,6 +11,6 @@
   <div
     class="flex flex-auto justify-end text-gray-500 group-hover:text-black group-hover:font-semibold"
   >
-    {{ data().time | date: 'HH:mm' }}
+    {{ data().dtSent | date: 'HH:mm' }}
   </div>
 </div>

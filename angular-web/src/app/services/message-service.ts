@@ -1,28 +1,53 @@
-import { Injectable, signal } from '@angular/core';
+import { inject, Injectable, signal } from '@angular/core';
 import { Client } from '@stomp/stompjs';
 import { MessageSend } from '../models/message-send';
 import { Message } from '../models/message';
+import { AuthService } from './auth-service';
+import { UserMessageItem } from '../models/user-message-item';
 
 @Injectable({
   providedIn: 'root',
 })
 export class MessageService {
+  private readonly authService = inject(AuthService);
+  private readonly userId = this.authService.getSubject();
+
   private readonly messages = signal<Message[]>([]);
   msgs = this.messages.asReadonly();
+
+  private readonly userMessages = signal<UserMessageItem[]>([]);
+  userMsgs = this.userMessages.asReadonly();
 
   private client: Client | null = null;
 
   connect() {
+    if (this.isClientActive()) return;
+
     this.disconnect();
+
+    this.messages.set([]);
 
     this.client = new Client({
       brokerURL: 'ws://localhost:8080/chat/api/ws',
+      connectHeaders: {
+        userId: this.userId!,
+      },
       onConnect: () => {
-        this.client?.subscribe('/topic/messages', (res) => {
+        this.client?.subscribe(`/user/topic/messages`, (res) => {
+          // TODO: This will break when added summaries. Prob on renderView call a httpget?
           console.log(`Received: ${res.body}`);
           if (res.body) {
             const message = JSON.parse(res.body);
             this.messages.set([...this.messages(), message]);
+          }
+        });
+
+        this.client?.subscribe('/topic/summaries', (res) => {
+          if (res.body) {
+            const result = JSON.parse(res.body);
+            console.log('parsed message:', result);
+            this.userMessages.set(result);
+            console.log('userMsgs:', this.userMessages());
           }
         });
       },
@@ -53,6 +78,13 @@ export class MessageService {
       destination: '/app/sendMessage',
       body: JSON.stringify(payload),
       headers: { 'content-type': 'application/json' },
+    });
+  }
+
+  search(term: string | null) {
+    const param = term === null || term.length === 0 ? '__EMPTY__' : term;
+    this.client?.publish({
+      destination: `/app/search/${param}`,
     });
   }
 }

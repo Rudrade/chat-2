@@ -4,11 +4,20 @@
     <p-iconfield>
       <p-inputicon class="fa-solid fa-magnifying-glass" />
       <label for="search">Search</label>
-      <input id="search" type="text" pInputText autocomplete="off" class="pr-4" fluid />
+      <input
+        id="search"
+        type="text"
+        pInputText
+        autocomplete="off"
+        class="pr-4"
+        fluid
+        (keypress)="onSearch($event)"
+        [(ngModel)]="searchTerm"
+      />
     </p-iconfield>
   </p-floatLabel>
   <div>
-    @for (message of messages(); track message.id) {
+    @for (message of messages(); track message.chatId) {
       <app-user-messages-item [data]="message" (click)="onUserClick(message)" />
     }
   </div>

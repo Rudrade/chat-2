@@ -1,8 +1,8 @@
 export interface UserMessageItem {
-  id: string;
+  chatId: string;
   name: string;
   online: boolean;
   lastMessage: string;
-  time: Date;
+  dtSent: Date;
   image: string;
 }

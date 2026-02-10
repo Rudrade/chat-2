@@ -48,6 +48,7 @@
     "@types/ws": "^8.18.1",
     "jsdom": "^27.1.0",
     "postcss": "^8.5.3",
+    "tailwind-scrollbar": "^4.0.2",
     "tailwindcss": "^4.1.12",
     "typescript": "~5.9.2",
     "vitest": "^4.0.8"

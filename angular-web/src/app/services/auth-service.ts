@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 
@@ -49,6 +49,13 @@ export class AuthService {
     }
 
     return decodedToken.exp * 1000 > Date.now();
+  }
+
+  getSubject() {
+    const token = this.getToken();
+    const decoded = jwtDecode(token!);
+
+    return decoded?.sub;
   }
 }
 

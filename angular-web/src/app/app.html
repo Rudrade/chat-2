@@ -6,7 +6,7 @@
     <div class="border-e-4 border-gray-200 basis-md">
       <app-user-messages (setChat)="setCurrentChat($event)" />
     </div>
-    <div class="basis-full">
+    <div class="basis-full max-h-lvh">
       @if (currentChat()) {
         <app-chat [data]="currentChat()" />
       }
