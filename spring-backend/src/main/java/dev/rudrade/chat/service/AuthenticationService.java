@@ -5,8 +5,10 @@ import dev.rudrade.chat.dto.response.LoginResponse;
 import dev.rudrade.chat.exception.UserNotFoundException;
 import dev.rudrade.chat.util.JwtUtil;
 import dev.rudrade.chat.util.ValidationUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
+
+import java.util.Objects;
+
 import org.springframework.stereotype.Service;
 
 @Service
@@ -17,8 +19,10 @@ public class AuthenticationService {
     private final ValidationUtil validator;
     private final JwtUtil jwtUtil;
 
-    public LoginResponse authenticate(@NotNull LoginRequest request) {
+    public LoginResponse authenticate(LoginRequest request) {
         // Validate input
+        Objects.requireNonNull(request, "A request must be passed to authenticate");
+
         validator.validate(request);
 
         // Find user

@@ -11,7 +11,7 @@
         autocomplete="off"
         class="pr-4"
         fluid
-        (keypress)="onSearch($event)"
+        (keyup)="onSearch($event)"
         [(ngModel)]="searchTerm"
       />
     </p-iconfield>

@@ -8,9 +8,9 @@ import dev.rudrade.chat.model.User;
 import dev.rudrade.chat.repository.UserRepository;
 import dev.rudrade.chat.util.MapperUtil;
 import dev.rudrade.chat.util.ValidationUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,7 +25,9 @@ public class UserService {
     private final ValidationUtil validator;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public User findUser(@NotNull LoginRequest request) {
+    public User findUser(LoginRequest request) {
+        Objects.requireNonNull(request, "request must be provided to find user");
+
         // Validate input
         validator.validate(request);
 
@@ -42,7 +44,8 @@ public class UserService {
         return user.get();
     }
 
-    public Optional<User> findById(@NotNull UUID userId) {
+    public Optional<User> findById(UUID userId) {
+        Objects.requireNonNull(userId, "userId must be provided to find user");
         return repository.findById(userId);
     }
 

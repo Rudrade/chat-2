@@ -26,7 +26,7 @@ public class InvalidDataException extends RuntimeException {
         Set<String> errors = HashSet.newHashSet(capacity);
         if (capacity == 0) return errors;
 
-        constraints.forEach(constraint -> errors.add(constraint.getMessage()));
+        constraints.forEach(constraint -> errors.add(constraint.getPropertyPath()+" "+constraint.getMessage()));
         return errors;
     }
 }

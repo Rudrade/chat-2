@@ -37,8 +37,6 @@ export class UserMessages implements OnInit {
   }
 
   onSearch(event: KeyboardEvent) {
-    if (event.key === 'Enter') {
-      this.messageService.search(this.searchTerm());
-    }
+    this.messageService.search(this.searchTerm());
   }
 }

@@ -34,7 +34,6 @@ export class MessageService {
       },
       onConnect: () => {
         this.client?.subscribe(`/user/topic/messages`, (res) => {
-          // TODO: This will break when added summaries. Prob on renderView call a httpget?
           console.log(`Received: ${res.body}`);
           if (res.body) {
             const message = JSON.parse(res.body);
@@ -42,7 +41,7 @@ export class MessageService {
           }
         });
 
-        this.client?.subscribe('/topic/summaries', (res) => {
+        this.client?.subscribe('/user/topic/summaries', (res) => {
           if (res.body) {
             const result = JSON.parse(res.body);
             console.log('parsed message:', result);

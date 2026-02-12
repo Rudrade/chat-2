@@ -2,6 +2,7 @@ package dev.rudrade.chat.util;
 
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Objects;
 import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -12,9 +13,9 @@ import com.auth0.jwt.algorithms.Algorithm;
 import com.auth0.jwt.exceptions.JWTVerificationException;
 import com.auth0.jwt.interfaces.DecodedJWT;
 
+import dev.rudrade.chat.exception.InvalidDataException;
 import dev.rudrade.chat.model.User;
 import dev.rudrade.chat.service.UserService;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
 @Component
@@ -29,11 +30,14 @@ public class JwtUtil {
     @Value("${app.security.jwt.issuer}")
     private String issuer;
 
-    public User getUserByToken(@NotNull String token) {
+    public User getUserByToken(String token) {
+        if (token == null)
+            throw new InvalidDataException("token must be provided");
+
         // Check if token is valid
         var decodedToken = decodeToken(token);
         if (decodedToken == null) {
-            return null;
+            throw new InvalidDataException("token must be valid");
         }
 
         // Check if user is active
@@ -46,7 +50,9 @@ public class JwtUtil {
         return null;
     }
 
-    public String generateToken(@NotNull User user) {
+    public String generateToken(User user) {
+        Objects.requireNonNull(user, "user must exist to generate a token");
+
         return JWT.create()
             .withIssuer(issuer)
             .withSubject(user.getId().toString())
@@ -55,13 +61,15 @@ public class JwtUtil {
             .sign(getAlgorithm());
     }
 
-    public DecodedJWT decodeToken(@NotNull String token) {
-        // Validate if has Bearer
-        if (!token.startsWith("Bearer "))
-            return null;
+    public DecodedJWT decodeToken(String token) {
+        if (token == null || token.isBlank())
+            throw new InvalidDataException("token must be provided");
 
         try {
-            var newToken = token.substring(7);
+            var newToken = token;
+            if (newToken.startsWith("Bearer ")) {
+                newToken = newToken.substring(7);
+            }
 
             // Return if is valid
             return JWT.require(getAlgorithm())
@@ -70,7 +78,7 @@ public class JwtUtil {
                 .verify(newToken);
 
         } catch(JWTVerificationException ex) {
-            return null;
+            throw new InvalidDataException("token provided invalid");
         }
     }
 

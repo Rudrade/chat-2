@@ -8,9 +8,9 @@ import java.util.UUID;
 
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
-import org.springframework.messaging.handler.annotation.SendTo;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
+import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.messaging.simp.user.SimpUser;
 import org.springframework.messaging.simp.user.SimpUserRegistry;
@@ -43,6 +43,7 @@ public class MessageController {
             message.text(),
             LocalDate.now());
         
+        // Send to all users of the chat that are subscribed
         var subscribers = registry.getUsers().stream().map(SimpUser::getName).toList();
         log.trace("subscribers:"+subscribers);
         subscribers.forEach(sub -> {
@@ -53,8 +54,7 @@ public class MessageController {
     }
 
     @MessageMapping("/search/{term}")
-    @SendTo("/topic/summaries")
-    public List<MessageSummaryDto> findSummaries(@DestinationVariable String term, Principal principal) {
+    public void findSummaries(@DestinationVariable String term, Principal principal, SimpMessageHeaderAccessor headerAccessor) {
         var result =  messageService.findSummaries(UUID.fromString(principal.getName()), term);
         
         List<MessageSummaryDto> resultDto = new ArrayList<>(result.size());
@@ -62,6 +62,16 @@ public class MessageController {
             var dto = MapperUtil.messageSummaryDto(r);
             resultDto.add(dto);
         });
-        return resultDto;
+
+        // Send to the session that called
+        var headers = SimpMessageHeaderAccessor.create();
+        headers.setSessionId(headerAccessor.getSessionId());
+        headers.setLeaveMutable(true);
+
+        messagingTemplate.convertAndSendToUser(
+            principal.getName(),
+            "/topic/summaries",
+            resultDto,
+            headers.getMessageHeaders());
     }
 }
