@@ -9,11 +9,15 @@ import org.springframework.web.socket.config.annotation.StompEndpointRegistry;
 import org.springframework.web.socket.config.annotation.WebSocketMessageBrokerConfigurer;
 
 import dev.rudrade.chat.controller.filter.WebsocketInterceptor;
+import lombok.RequiredArgsConstructor;
 
 @Configuration
 @EnableWebSocketMessageBroker
+@RequiredArgsConstructor
 public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
+    private final WebsocketInterceptor websocketInterceptor;
+    
     @Value("${app.security.allowed-origins}")
     private String[] allowedOrigins;
 
@@ -32,7 +36,7 @@ public class WebsocketConfig implements WebSocketMessageBrokerConfigurer {
 
     @Override
     public void configureClientInboundChannel(ChannelRegistration registration) {
-        registration.interceptors(new WebsocketInterceptor());
+        registration.interceptors(websocketInterceptor);
     }
 
 

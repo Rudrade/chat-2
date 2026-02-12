@@ -1,1 +1,2 @@
 insert into users(id, active, password, username, name) values ('29a8d960-46d2-4e55-80ab-7f6477541a28', true, '$2a$16$w.yonojJ0u2cf1LOgWlmXeSaDkiQd0ajL.3tm6Z1ueTnSHxefafse','user-test','test') on conflict do nothing;
+insert into users(id, active, password, username, name) values ('29a8d960-46d2-4e55-80ab-7f6477541d28', true, '$2a$16$w.yonojJ0u2cf1LOgWlmXeSaDkiQd0ajL.3tm6Z1ueTnSHxefafse','user-test-2','test') on conflict do nothing;

@@ -10,20 +10,26 @@ import java.util.List;
 import java.util.Map;
 import java.util.UUID;
 import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
 
 import org.jspecify.annotations.Nullable;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.NullAndEmptySource;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.boot.test.context.SpringBootTest.WebEnvironment;
 import org.springframework.boot.test.web.server.LocalServerPort;
+import org.springframework.http.HttpHeaders;
 import org.springframework.messaging.converter.JacksonJsonMessageConverter;
 import org.springframework.messaging.simp.stomp.StompFrameHandler;
 import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.test.context.jdbc.Sql;
+import org.springframework.test.context.jdbc.Sql.ExecutionPhase;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
@@ -31,17 +37,21 @@ import org.springframework.web.socket.messaging.WebSocketStompClient;
 import dev.rudrade.chat.SqlIntegrationTest;
 import dev.rudrade.chat.dto.MessageSummaryDto;
 import dev.rudrade.chat.repository.UserRepository;
+import dev.rudrade.chat.util.JwtUtil;
 import lombok.extern.slf4j.Slf4j;
 
 @Slf4j
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
-@Sql({"/sql-scripts/users.sql","/sql-scripts/messages.sql"})
+@Sql(
+    scripts = {"/sql-scripts/users.sql","/sql-scripts/messages.sql"},
+    executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
 class MessageControllerTest extends SqlIntegrationTest {
     
     private WebSocketStompClient wsClient;
     private CompletableFuture<List<MessageSummaryDto>> completableFuture;
 
     @Autowired private UserRepository userRepository;
+    @Autowired private JwtUtil jwtUtil;
     
     @LocalServerPort private int port;
     private String url;
@@ -59,10 +69,38 @@ class MessageControllerTest extends SqlIntegrationTest {
     //  findSummaries
     //==================
 
+    @ParameterizedTest
+    @NullAndEmptySource
+    @ValueSource(strings = {
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiYWRtaW4iOnRydWUsImlhdCI6MTUxNjIzOTAyMn0.KMUFsIDTnFmyG3nMiGM6H9FNFUROf3wh7SmqJp-QV30", // Invalid
+        "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJjaGF0YXBwIiwic3ViIjoiMjlhOGQ5NjAtNDZkMi00ZTU1LTgwYWItN2Y2NDc3NTQxYTczIiwiaWF0IjoxNDIwMDcwNDAwLCJleHAiOjE0MjAwNzA0MDB9.Uu53P1zZ68t5HaqF1rDXRg2_6LoRccrIziTHDQSksa8" // Expired
+    })
+    void itShouldNotConnectWhenTryingToConnectWithInvalidToken(String token) {
+        var handshakeHeader = new WebSocketHttpHeaders();
+        if (token != null)
+            handshakeHeader.add(HttpHeaders.AUTHORIZATION, "Bearer "+token);
+
+        var connectHeaders = new StompHeaders();
+        if (token != null)
+            connectHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer "+token);
+
+        var cause = assertThrows(ExecutionException.class, 
+            () -> wsClient.connectAsync(url, handshakeHeader, connectHeaders, new StompSessionHandlerAdapter() {}).get()
+        ).getCause();
+
+        assertThat(cause.getMessage()).containsAnyOf("401", "403", "Connection closed");
+    }
+
     @Test
     void findSummaries() throws Exception {
+        var user1 = userRepository.findByUsername("user-test");
+        var token1 = jwtUtil.generateToken(user1.get());
+
+        var user2 = userRepository.findByUsername("user-test-2");
+        var token2 =  jwtUtil.generateToken(user2.get());
+
         var connectHeaders = new StompHeaders();
-        connectHeaders.add("userId", "29a8d960-46d2-4e55-80ab-7f6477541a28");
+        connectHeaders.add(HttpHeaders.AUTHORIZATION, "Bearer "+token1);
 
         // Main session
         var session = wsClient.connectAsync(url, new WebSocketHttpHeaders(), connectHeaders, new StompSessionHandlerAdapter() {}).get();
@@ -70,7 +108,7 @@ class MessageControllerTest extends SqlIntegrationTest {
 
         // Second sesssion -> Can't get things
         var connectHeaders2 = new StompHeaders();
-        connectHeaders2.add("userId", "29a8d960-46d2-4e55-80ab-7f6477541c28");
+        connectHeaders2.add(HttpHeaders.AUTHORIZATION, "Bearer "+token2);
 
         var session2 = wsClient.connectAsync(url, new WebSocketHttpHeaders(), connectHeaders2, new StompSessionHandlerAdapter() {}).get();
         assertTrue(session2.isConnected());

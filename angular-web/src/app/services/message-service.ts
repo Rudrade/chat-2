@@ -10,7 +10,6 @@ import { UserMessageItem } from '../models/user-message-item';
 })
 export class MessageService {
   private readonly authService = inject(AuthService);
-  private readonly userId = this.authService.getSubject();
 
   private readonly messages = signal<Message[]>([]);
   msgs = this.messages.asReadonly();
@@ -30,7 +29,7 @@ export class MessageService {
     this.client = new Client({
       brokerURL: 'ws://localhost:8080/chat/api/ws',
       connectHeaders: {
-        userId: this.userId!,
+        Authorization: this.authService.getToken()!,
       },
       onConnect: () => {
         this.client?.subscribe(`/user/topic/messages`, (res) => {

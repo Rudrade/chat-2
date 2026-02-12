@@ -9,6 +9,7 @@ import java.util.UUID;
 import org.springframework.messaging.handler.annotation.DestinationVariable;
 import org.springframework.messaging.handler.annotation.MessageMapping;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.stereotype.Controller;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
@@ -19,6 +20,7 @@ import dev.rudrade.chat.dto.MessageDto;
 import dev.rudrade.chat.dto.MessageInputDto;
 import dev.rudrade.chat.dto.MessageSummaryDto;
 import dev.rudrade.chat.service.MessageService;
+import dev.rudrade.chat.util.AuthenticationUtil;
 import dev.rudrade.chat.util.MapperUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -55,7 +57,8 @@ public class MessageController {
 
     @MessageMapping("/search/{term}")
     public void findSummaries(@DestinationVariable String term, Principal principal, SimpMessageHeaderAccessor headerAccessor) {
-        var result =  messageService.findSummaries(UUID.fromString(principal.getName()), term);
+        var user = AuthenticationUtil.extractFromPrincipal(principal);
+        var result =  messageService.findSummaries(user.getId(), term);
         
         List<MessageSummaryDto> resultDto = new ArrayList<>(result.size());
         result.forEach(r -> {
