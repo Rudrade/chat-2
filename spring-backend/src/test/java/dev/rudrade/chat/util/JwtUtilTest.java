@@ -63,13 +63,13 @@ class JwtUtilTest {
         user.setId(userId);
         user.setActive(false);
 
-        when(userService.findById(userId))
+        when(userService.findActiveById(userId))
             .thenReturn(Optional.of(user));
 
         var result = target.getUserByToken(token);
         assertNull(result);
 
-        verify(userService, times(1)).findById(userId);
+        verify(userService, times(1)).findActiveById(userId);
         verifyNoMoreInteractions(userService);
     }
 
@@ -78,13 +78,13 @@ class JwtUtilTest {
         var userId = UUID.randomUUID();
         var token = newToken(userId);
 
-        when(userService.findById(userId))
+        when(userService.findActiveById(userId))
             .thenReturn(Optional.empty());
 
         var result = target.getUserByToken(token);
         assertNull(result);
 
-        verify(userService, times(1)).findById(userId);
+        verify(userService, times(1)).findActiveById(userId);
         verifyNoMoreInteractions(userService);
     }
 
@@ -106,7 +106,7 @@ class JwtUtilTest {
         user.setUsername("test user");
         user.setActive(true);
 
-        when(userService.findById(userId))
+        when(userService.findActiveById(userId))
             .thenReturn(Optional.of(user));
 
         var result = target.getUserByToken(token);
@@ -114,7 +114,7 @@ class JwtUtilTest {
         assertThat(result)
             .isNotNull();
         
-        verify(userService, times(1)).findById(userId);
+        verify(userService, times(1)).findActiveById(userId);
         verifyNoMoreInteractions(userService);
     }
 

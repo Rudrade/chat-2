@@ -28,20 +28,20 @@ import java.util.UUID;
 public class User implements UserDetails, CredentialsContainer {
 
     @Id
-    @Column(nullable = false)
     @GeneratedValue(strategy = GenerationType.UUID)
+    @Column(name = "id", nullable = false, unique = true, updatable = false)
     private UUID id;
 
-    @Column(nullable = false, unique = true)
     @NotBlank
+    @Column(nullable = false, unique = true)
     private String username;
 
-    @Column(nullable = false)
     @NotBlank
+    @Column(nullable = false)
     private String name;
 
-    @Column(nullable = false)
     @NotBlank
+    @Column(nullable = false)
     private String password;
 
     @Column(nullable = false)

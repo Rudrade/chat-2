@@ -10,6 +10,7 @@ import dev.rudrade.chat.util.MapperUtil;
 import dev.rudrade.chat.util.ValidationUtil;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
@@ -44,13 +45,24 @@ public class UserService {
         return user.get();
     }
 
-    public Optional<User> findById(UUID userId) {
+    public Optional<User> findActiveById(UUID userId) {
         Objects.requireNonNull(userId, "userId must be provided to find user");
-        return repository.findById(userId);
+        var result = repository.findById(userId);
+        if (result.isPresent() && !result.get().isActive()) {
+            return Optional.empty();
+        }
+
+        return result;
     }
 
     public UserDto findDetails() {
         var user = repository.findDetails().orElseThrow(InvalidAccessException::new);
         return MapperUtil.userDto(user);
+    }
+
+    public List<User> findActiveByChat(UUID chatId) {
+        Objects.requireNonNull(chatId, "id must exist to get users");
+
+        return repository.findActiveByChatId(chatId);
     }
 }

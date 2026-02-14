@@ -2,6 +2,8 @@ package dev.rudrade.chat.dto;
 
 import java.util.UUID;
 
-public record MessageInputDto(UUID idTo, String text) {
+import jakarta.validation.constraints.NotBlank;
+
+public record MessageInputDto(UUID idChat, UUID idUserTo, @NotBlank String text) {
 
 }

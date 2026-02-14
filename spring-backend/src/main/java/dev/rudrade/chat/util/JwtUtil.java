@@ -42,7 +42,7 @@ public class JwtUtil {
 
         // Check if user is active
         var userId = UUID.fromString(decodedToken.getSubject());
-        var user = userService.findById(userId);
+        var user = userService.findActiveById(userId);
         if (user.isPresent() && user.get().isActive()) {
             return user.get();
         }

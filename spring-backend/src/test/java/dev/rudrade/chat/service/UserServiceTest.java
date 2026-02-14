@@ -2,8 +2,11 @@ package dev.rudrade.chat.service;
 
 import static org.assertj.core.api.Assertions.*;
 import static org.junit.jupiter.api.Assertions.assertThrows;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.*;
 
+import java.util.Comparator;
+import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -191,21 +194,22 @@ class UserServiceTest {
         verifyNoInteractions(validationUtil, passwordEncoder);
     }
 
-    //=============
-    //  findById
-    //=============
+    //===================
+    //  findActiveById
+    //===================
 
     @Test
-    void itShouldFindById() {
+    void itShouldFindActiveById() {
         var id = UUID.randomUUID();
 
         var user = new User();
         user.setId(id);
+        user.setActive(true);
 
         when(userRepository.findById(id))
             .thenReturn(Optional.of(user));
 
-        var result = target.findById(id);
+        var result = target.findActiveById(id);
 
         assertThat(result)
             .isNotNull()
@@ -215,6 +219,70 @@ class UserServiceTest {
         verify(userRepository, times(1)).findById(id);
         verifyNoMoreInteractions(userRepository);
         verifyNoInteractions(validationUtil, passwordEncoder);
+    }
+
+    @Test
+    void itShouldReturnEmptyWhenUserIsNotPresent() {
+        var userId = UUID.randomUUID();
+
+        when(userRepository.findById(userId))
+            .thenReturn(Optional.empty());
+
+        var result = target.findActiveById(userId);
+
+        assertTrue(result.isEmpty());
+        
+        verify(userRepository, times(1)).findById(userId);
+        verifyNoMoreInteractions(userRepository, validationUtil, passwordEncoder);
+    }
+
+    @Test
+    void itShouldReturnEmptyWhenUserIsNotActive() {
+        var userId = UUID.randomUUID();
+
+        var user = new User();
+        user.setId(userId);
+        user.setActive(false);
+
+        when(userRepository.findById(userId))
+            .thenReturn(Optional.of(user));
+
+        var result = target.findActiveById(userId);
+        
+        assertTrue(result.isEmpty());
+
+        verify(userRepository, times(1)).findById(userId);
+        verifyNoMoreInteractions(userRepository, validationUtil, passwordEncoder);
+    }
+
+    //======================
+    //  findActiveByChat
+    //======================
+
+    @Test
+    void itShouldFindActiveByChat() {
+        var chatId = UUID.randomUUID();
+
+        var user1 = new User();
+        user1.setId(UUID.randomUUID());
+
+        var user2 = new User();
+        user2.setId(UUID.randomUUID());
+
+        var lst = List.of(user1, user2);
+
+        when(userRepository.findActiveByChatId(chatId))
+            .thenReturn(lst);
+
+        var result = target.findActiveByChat(chatId);
+
+        assertThat(result)
+            .hasSize(2)
+            .usingElementComparator(Comparator.comparing(User::getId))
+            .isEqualTo(lst);
+
+        verify(userRepository, times(1)).findActiveByChatId(chatId);
+        verifyNoMoreInteractions(userRepository, validationUtil, passwordEncoder);
     }
 
 }

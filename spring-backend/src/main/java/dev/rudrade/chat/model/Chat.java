@@ -3,8 +3,11 @@ package dev.rudrade.chat.model;
 import java.util.List;
 import java.util.UUID;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
@@ -27,6 +30,13 @@ public class Chat {
     @GeneratedValue(strategy = GenerationType.UUID)
     private UUID id;
 
+    @Column
+    private String title;
+
+    @Column(nullable = false)
+    @Enumerated(EnumType.STRING)
+    private ChatType type;
+
     @NotEmpty
     @ManyToMany
     @JoinTable(name="chat_users")
@@ -35,4 +45,8 @@ public class Chat {
     @OneToMany(mappedBy = "chat")
     private List<Message> messages;
 
+    public enum ChatType {
+        ONE,
+        GROUP
+    }
 }
