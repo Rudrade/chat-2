@@ -1,5 +1,5 @@
 import { Component, inject, OnInit, output, signal } from '@angular/core';
-import { UserMessageItem } from '../../models/user-message-item';
+import { MessageSummary } from '../../models/message-summary';
 import { UserMessagesItem } from './user-messages-item/user-messages-item';
 import { IconFieldModule } from 'primeng/iconfield';
 import { InputIconModule } from 'primeng/inputicon';
@@ -25,14 +25,14 @@ export class UserMessages implements OnInit {
   private readonly messageService = inject(MessageService);
   messages = this.messageService.userMsgs;
 
-  setChat = output<UserMessageItem>();
+  setChat = output<MessageSummary>();
   searchTerm = signal<string>('');
 
   ngOnInit(): void {
     this.messageService.connect();
   }
 
-  onUserClick(chat: UserMessageItem) {
+  onUserClick(chat: MessageSummary) {
     this.setChat.emit(chat);
   }
 

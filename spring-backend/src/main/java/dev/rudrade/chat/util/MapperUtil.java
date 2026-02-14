@@ -24,6 +24,7 @@ public class MapperUtil {
 
         return new MessageSummaryDto(
             messageSummary.chatId(),
+            messageSummary.userId(),
             messageSummary.name(),
             false,
             messageSummary.text(),

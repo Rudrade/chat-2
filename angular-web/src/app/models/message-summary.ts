@@ -1,5 +1,6 @@
-export interface UserMessageItem {
-  chatId: string;
+export interface MessageSummary {
+  chatId?: string;
+  userId?: string;
   name: string;
   online: boolean;
   lastMessage: string;

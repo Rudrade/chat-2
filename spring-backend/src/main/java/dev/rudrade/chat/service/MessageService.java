@@ -78,6 +78,7 @@ public class MessageService {
                 chat.setType(ChatType.ONE);
                 chat.setUsers(List.of(user, userTo.get()));
                 message.setChat(chat);
+                chatRepository.save(chat);
             }
         
         } else {

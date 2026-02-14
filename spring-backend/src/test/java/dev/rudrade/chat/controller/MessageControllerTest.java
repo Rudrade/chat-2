@@ -339,6 +339,8 @@ class MessageControllerTest extends SqlIntegrationTest {
                 // Using this validation for nulls, otherwise ObjectMapper gets stuck
                 var strChatId = (String) map.get("chatId");
                 var chatId = strChatId != null ? UUID.fromString(strChatId) : null;
+                var strUserId = (String) map.get("userId");
+                var userId = strUserId != null ? UUID.fromString(strUserId) : null;
                 var name = (String) map.get("name");
                 var online = (boolean) map.get("online");
                 var lastMessage = (String) map.get("lastMessage");
@@ -346,7 +348,7 @@ class MessageControllerTest extends SqlIntegrationTest {
                 var dtSent = strDtSent != null ? LocalDateTime.parse(strDtSent) : null;
                 var image = (String) map.get("image");
 
-                result.add(new MessageSummaryDto(chatId, name, online, lastMessage, dtSent, image));
+                result.add(new MessageSummaryDto(chatId, userId, name, online, lastMessage, dtSent, image));
             });
             
             log.debug("End parsing, calling complete");

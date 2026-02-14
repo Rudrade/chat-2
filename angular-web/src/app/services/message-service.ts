@@ -3,7 +3,7 @@ import { Client } from '@stomp/stompjs';
 import { MessageSend } from '../models/message-send';
 import { Message } from '../models/message';
 import { AuthService } from './auth-service';
-import { UserMessageItem } from '../models/user-message-item';
+import { MessageSummary } from '../models/message-summary';
 
 @Injectable({
   providedIn: 'root',
@@ -14,7 +14,7 @@ export class MessageService {
   private readonly messages = signal<Message[]>([]);
   msgs = this.messages.asReadonly();
 
-  private readonly userMessages = signal<UserMessageItem[]>([]);
+  private readonly userMessages = signal<MessageSummary[]>([]);
   userMsgs = this.userMessages.asReadonly();
 
   private client: Client | null = null;
@@ -66,10 +66,11 @@ export class MessageService {
     if (this.isClientActive()) this.client?.deactivate();
   }
 
-  sendChat(message: string) {
+  sendChat(message: string, idUserTo?: string, idChatTo?: string) {
     const payload: MessageSend = {
-      idTo: '5405e343-c832-4972-a9e5-4702e9364ac2',
       text: message,
+      idUserTo,
+      idChatTo,
     };
 
     this.client?.publish({

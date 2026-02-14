@@ -78,4 +78,5 @@ public class MessageController {
     }
 
     // TODO: Create GET to fetch latest summary that frontend calls at load.
+    // TODO: Create GET to fetch latest messages of a chat, so frontend calls first. Or on subscribe, return it
 }

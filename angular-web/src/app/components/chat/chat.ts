@@ -10,7 +10,7 @@ import {
   computed,
   effect,
 } from '@angular/core';
-import { UserMessageItem } from '../../models/user-message-item';
+import { MessageSummary } from '../../models/message-summary';
 import { MessageService } from '../../services/message-service';
 import { FormsModule } from '@angular/forms';
 import { AvatarModule } from 'primeng/avatar';
@@ -54,7 +54,7 @@ export class Chat implements OnDestroy, AfterViewInit {
   @ViewChild('msgContainer') msgContainer!: ElementRef<HTMLDivElement>;
   private lastMessagesLen = 0;
 
-  data = input.required<UserMessageItem | undefined>();
+  data = input.required<MessageSummary | undefined>();
   message = signal<string | null>(null);
 
   readonly loggedId = this.authService.getSubject();
@@ -127,7 +127,7 @@ export class Chat implements OnDestroy, AfterViewInit {
   onMessageSend() {
     if (!this.message()) return;
 
-    this.messageService.sendChat(this.message()!);
+    this.messageService.sendChat(this.message()!, this.data()?.userId, this.data()?.chatId);
     this.message.set(null);
   }
 

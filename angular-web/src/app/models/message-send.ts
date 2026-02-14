@@ -1,4 +1,5 @@
 export interface MessageSend {
-  idTo: string;
   text: string;
+  idUserTo?: string;
+  idChatTo?: string;
 }

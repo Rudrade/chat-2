@@ -40,7 +40,7 @@ public class Message {
     private User user;
 
     @NotNull
-    @ManyToOne(cascade = CascadeType.PERSIST)
+    @ManyToOne
     private Chat chat;
 
 }
