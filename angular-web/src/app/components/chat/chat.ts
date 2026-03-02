@@ -114,7 +114,6 @@ export class Chat implements OnDestroy, AfterViewInit {
       this.loadMoreOlder();
     }
   }
-  // TODO: When click on chat already open, messages are getting duplicated and not cleared
   // TODO: After a while, sending messages stop working: dev.rudrade.chat.exception.InvalidDataException: cannot send message to yourself
 
   private loadMoreOlder() {
