@@ -14,7 +14,11 @@ public abstract class SqlIntegrationTest {
     @Container
     static SqlContainer sqlContainer = new SqlContainer();
     static {
-        sqlContainer.start();
+        if (!sqlContainer.isRunning()) {
+            sqlContainer.start();
+            sqlContainer.withConnectTimeoutSeconds(5);
+        }
+        
     }
 
     @DynamicPropertySource

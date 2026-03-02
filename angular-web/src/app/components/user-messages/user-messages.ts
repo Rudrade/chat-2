@@ -29,7 +29,13 @@ export class UserMessages implements OnInit {
   searchTerm = signal<string>('');
 
   ngOnInit(): void {
-    this.messageService.connect();
+    console.log('usermessages - connecting');
+    this.messageService.connect().subscribe({
+      complete: () => {
+        console.log('usermessages - complete');
+        this.messageService.search(null);
+      },
+    });
   }
 
   onUserClick(chat: MessageSummary) {

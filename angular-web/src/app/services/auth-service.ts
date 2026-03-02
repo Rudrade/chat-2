@@ -10,6 +10,7 @@ export class AuthService {
   private readonly route = inject(Router);
   private readonly httpClient = inject(HttpClient);
   private readonly keyStorage = 'sessionData';
+  private username?: string;
 
   login(username: string, password: string) {
     return this.httpClient.post<AuthResponse>('http://localhost:8080/chat/api/user/login', {
@@ -35,6 +36,14 @@ export class AuthService {
 
   setToken(token: string) {
     sessionStorage.setItem(this.keyStorage, token);
+  }
+
+  setCurrentUsername(username: string) {
+    this.username = username;
+  }
+
+  getCurrenUsername() {
+    return this.username;
   }
 
   isUserAuthenticated() {

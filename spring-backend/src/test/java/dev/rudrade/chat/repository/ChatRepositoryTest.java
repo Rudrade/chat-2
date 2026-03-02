@@ -65,4 +65,15 @@ class ChatRepositoryTest extends SqlIntegrationTest {
         assertEquals(UUID.fromString("c7ff9617-98a8-4f12-8d01-d5b0870b0967"), result.get().getId());
     }
 
+    @Test
+    void itShouldntFindWithoutChat() {
+        var userId = List.of(
+            UUID.fromString("29a8d960-46d2-4e55-80ab-7f6477541a28"),
+            UUID.fromString("29a8d960-46d2-4e55-80bc-7f6477541a28")
+        );
+
+        var result = repository.findByTypeAndUsers(ChatType.ONE.name(), userId);
+        assertTrue(result.isEmpty());
+    }
+
 }

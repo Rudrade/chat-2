@@ -31,9 +31,8 @@ public class WebsocketInterceptor implements ChannelInterceptor {
         var acessor = MessageHeaderAccessor.getAccessor(message, StompHeaderAccessor.class);
         if (acessor != null && StompCommand.CONNECT.equals(acessor.getCommand())) {
             var authHeader = acessor.getFirstNativeHeader(HttpHeaders.AUTHORIZATION);
-            log.trace("authHeader:"+authHeader);
             var user = jwtUtil.getUserByToken(authHeader);
-            log.trace("user:"+user);
+            // TODO: processed CONNECT(11)-CONNECTED(11)-DISCONNECT(10)
             if (user != null) {
                 var token = new UsernamePasswordAuthenticationToken(user, null, List.of());
                 SecurityContextHolder.getContext().setAuthentication(token);

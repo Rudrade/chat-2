@@ -15,8 +15,11 @@
   >
     @for (message of displayedMessages(); track $index) {
       <div
-        class="mb-4 size-fit max-w-60 wrap-break-word rounded pr-4 ps-2 shadow-md ms-0 mr-2"
-        [class]="`${message.idFrom === loggedId ? 'bg-white self-start' : 'bg-sky-100 self-end'}`"
+        class="mb-2 w-fit max-w-60 break-words rounded pr-4 ps-2 shadow-md"
+        [class.self-start]="message.idFrom === loggedId"
+        [class.self-end]="message.idFrom !== loggedId"
+        [class.bg-white]="message.idFrom === loggedId"
+        [class.bg-sky-100]="message.idFrom !== loggedId"
         [tabindex]="$last ? -1 : 0"
       >
         <p class="m-0">

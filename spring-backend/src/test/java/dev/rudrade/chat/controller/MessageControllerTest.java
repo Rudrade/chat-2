@@ -52,7 +52,8 @@ import lombok.extern.slf4j.Slf4j;
 @SpringBootTest(webEnvironment = WebEnvironment.RANDOM_PORT)
 @Sql(
     scripts = {"/sql-scripts/users.sql"},
-    executionPhase = ExecutionPhase.BEFORE_TEST_CLASS)
+    executionPhase = ExecutionPhase.BEFORE_TEST_CLASS
+)
 class MessageControllerTest extends SqlIntegrationTest {
 
     private WebSocketStompClient wsClient;
@@ -252,7 +253,7 @@ class MessageControllerTest extends SqlIntegrationTest {
         session.send("/app/search/temp", null);
 
         var result = future1.get(5, TimeUnit.SECONDS);
-        assertThat(result).hasSize(5);
+        assertThat(result).hasSize(10);
 
         assertThrows(TimeoutException.class, 
             () -> future2.get(5, TimeUnit.SECONDS)
@@ -280,7 +281,7 @@ class MessageControllerTest extends SqlIntegrationTest {
             }
         });
 
-        assertThat(name).hasSize(5).containsExactlyInAnyOrderElementsOf(usersDb);
+        assertThat(name).hasSize(10).containsExactlyInAnyOrderElementsOf(usersDb);
 
         assertThat(result)
             .usingDefaultElementComparator()

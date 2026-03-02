@@ -10,7 +10,6 @@ import org.springframework.boot.webmvc.test.autoconfigure.AutoConfigureMockMvc;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.mock.web.MockHttpServletResponse;
-import org.springframework.test.context.jdbc.Sql;
 import org.springframework.test.web.servlet.assertj.MockMvcTester;
 
 import dev.rudrade.chat.dto.request.LoginRequest;
@@ -19,7 +18,6 @@ import dev.rudrade.chat.dto.response.LoginResponse;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-@Sql("/sql-scripts/users.sql")
 @SpringBootTest
 @AutoConfigureMockMvc
 public abstract class ControllerIntegrationTest extends SqlIntegrationTest {
@@ -28,10 +26,14 @@ public abstract class ControllerIntegrationTest extends SqlIntegrationTest {
     private String authToken;
     
     protected String getAuthToken() {
+        return getAuthToken("user-test", "user");
+    }
+
+    protected String getAuthToken(String username, String password) {
         if (authToken != null) return authToken;
         
         try {
-            var request = new LoginRequest("user-test", "user");
+            var request = new LoginRequest(username, password);
             var result = post("/user/login", request);
             var response = fromResponse(result, LoginResponse.class);
             authToken = response.token();

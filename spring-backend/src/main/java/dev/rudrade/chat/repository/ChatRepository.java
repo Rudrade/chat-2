@@ -20,6 +20,8 @@ public interface ChatRepository extends CrudRepository<Chat, UUID> {
         + " from chat c "
         + " inner join chat_users cu on cu.chats_id = c.id "
         + " where c.type = :type and cu.users_id in :users "
+        + " group by c.id "
+        + " having count(distinct cu.users_id) = :#{#users.size()} and count(*) = :#{#users.size()}"
         + " limit 1 "
     )
     Optional<Chat> findByTypeAndUsers(String type, List<UUID> users);

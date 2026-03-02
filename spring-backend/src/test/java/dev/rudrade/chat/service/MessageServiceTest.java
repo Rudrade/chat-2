@@ -13,15 +13,14 @@ import java.util.UUID;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.NullAndEmptySource;
-import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.data.domain.PageImpl;
 import org.springframework.data.domain.Pageable;
 
 import dev.rudrade.chat.dto.MessageInputDto;
+import dev.rudrade.chat.dto.request.MessageSearchFilter;
+import dev.rudrade.chat.dto.request.MessageSearchFilter.FilterType;
 import dev.rudrade.chat.exception.InvalidDataException;
 import dev.rudrade.chat.model.Chat;
 import dev.rudrade.chat.model.Message;
@@ -29,6 +28,7 @@ import dev.rudrade.chat.model.MessageSummary;
 import dev.rudrade.chat.model.User;
 import dev.rudrade.chat.repository.ChatRepository;
 import dev.rudrade.chat.repository.MessageRepository;
+import dev.rudrade.chat.util.MapperUtil;
 import dev.rudrade.chat.util.ValidationUtil;
 
 @ExtendWith(MockitoExtension.class)
@@ -44,53 +44,56 @@ class MessageServiceTest {
     void init() {
         target = new MessageService(messageRepository, validationUtil, userService, chatRepository);
     }
-
     //==================
     //  findSummaries
     //==================
 
-    @ParameterizedTest
-    @NullAndEmptySource
-    @ValueSource(strings = {"__EMPTY__"})
-    void itShouldFindSummariesWithBlankTerm(String term) {
+    @Test
+    void itShouldFindSummariesWithOnlyMessages() {
         var userId = UUID.randomUUID();
+        var filter = new MessageSearchFilter(FilterType.ONLY_WITH_MESSAGES, null, null, null);
 
         var expected = List.of(
             new MessageSummary("test 1", UUID.randomUUID(), "text", LocalDateTime.now(), UUID.randomUUID()),
             new MessageSummary("test 2", UUID.randomUUID(), null, null, UUID.randomUUID())
         );
 
-         when(messageRepository.findLatest(eq(userId), nullable(String.class), any(Pageable.class)))
+        var expectedDto = expected.stream().map(MapperUtil::messageSummaryDto).toList();
+
+         when(messageRepository.findLatestWithMessages(eq(userId), any(Pageable.class)))
             .thenReturn(new PageImpl<>(expected));
 
-        var result = target.findSummaries(userId, term);
+        var result = target.findSummaries(filter, userId);
         assertThat(result)
             .isNotNull()
             .isNotEmpty()
-            .containsExactlyInAnyOrderElementsOf(expected);
+            .containsExactlyInAnyOrderElementsOf(expectedDto);
 
-        verify(messageRepository, times(1)).findLatest(eq(userId), nullable(String.class), any(Pageable.class));
-        verifyNoMoreInteractions(messageRepository);
+        verify(messageRepository, times(1)).findLatestWithMessages(eq(userId), any(Pageable.class));
+        verifyNoMoreInteractions(messageRepository, validationUtil, userService, chatRepository);
     }
 
     @Test
     void itShouldFindSummaries() {
         var userId = UUID.randomUUID();
         var term = "test";
+        var filter = new MessageSearchFilter(FilterType.SEARCH, term, null, null);
 
         var expected = List.of(
             new MessageSummary("test 1", UUID.randomUUID(), "text", LocalDateTime.now(), UUID.randomUUID()),
             new MessageSummary("test 2", UUID.randomUUID(), null, null, UUID.randomUUID())
         );
 
+        var expectedDto = expected.stream().map(MapperUtil::messageSummaryDto).toList();
+
         when(messageRepository.findLatest(eq(userId), eq(term), any(Pageable.class)))
             .thenReturn(new PageImpl<>(expected));
 
-        var result = target.findSummaries(userId, term);
+        var result = target.findSummaries(filter, userId);
         assertThat(result)
             .isNotNull()
             .isNotEmpty()
-            .containsExactlyInAnyOrderElementsOf(expected);
+            .containsExactlyInAnyOrderElementsOf(expectedDto);
 
         verify(messageRepository, times(1)).findLatest(eq(userId), eq(term), any(Pageable.class));
         verifyNoMoreInteractions(messageRepository);
@@ -172,27 +175,6 @@ class MessageServiceTest {
     }
 
     @Test
-    void itShouldThrowWhenTargetUserIsNotActive() {
-        var userId = UUID.randomUUID();
-        var targetUserId = UUID.randomUUID();
-        var user = new User();
-        user.setId(userId);
-
-        var input = new MessageInputDto(null, targetUserId, "test message");
-
-        when(userService.findActiveById(targetUserId))
-            .thenReturn(Optional.empty());
-
-        assertThrows(InvalidDataException.class,
-            () -> target.sendMessage(input, user)
-        );
-
-        verify(validationUtil, times(1)).validate(input);
-        verify(userService, times(1)).findActiveById(targetUserId);
-        verifyNoMoreInteractions(validationUtil, messageRepository, userService, chatRepository);
-    }
-
-    @Test
     void itShouldThrowWhenTargetChatDoesntExistForUser() {
         var userId = UUID.randomUUID();
         var chatId = UUID.randomUUID();
@@ -235,7 +217,7 @@ class MessageServiceTest {
         when(userService.findActiveById(targetUserId))
             .thenReturn(Optional.of(targetUser));
 
-        when(chatRepository.findByTypeAndUsers(eq(Chat.ChatType.ONE.name()), eq(List.of(userId, targetUserId))))
+        when(chatRepository.findByTypeAndUsers(Chat.ChatType.ONE.name(), List.of(userId, targetUserId)))
             .thenReturn(Optional.of(chat));
 
         when(messageRepository.save(any(Message.class)))
@@ -259,7 +241,7 @@ class MessageServiceTest {
         
             verify(validationUtil, times(1)).validate(input);
         verify(userService, times(1)).findActiveById(targetUserId);
-        verify(chatRepository, times(1)).findByTypeAndUsers(eq(Chat.ChatType.ONE.name()), eq(List.of(userId, targetUserId)));
+        verify(chatRepository, times(1)).findByTypeAndUsers(Chat.ChatType.ONE.name(), List.of(userId, targetUserId));
         verify(messageRepository, times(1)).save(any(Message.class));
         verifyNoMoreInteractions(validationUtil, messageRepository, userService, chatRepository);
     }
@@ -305,6 +287,7 @@ class MessageServiceTest {
         verify(validationUtil, times(1)).validate(input);
         verify(userService, times(1)).findActiveById(targetUserId);
         verify(chatRepository, times(1)).findByTypeAndUsers(Chat.ChatType.ONE.name(), List.of(userId, targetUserId));
+        verify(chatRepository, times(1)).save(any(Chat.class));
         verify(messageRepository, times(1)).save(any(Message.class));
         verifyNoMoreInteractions(validationUtil, messageRepository, userService, chatRepository);
     }

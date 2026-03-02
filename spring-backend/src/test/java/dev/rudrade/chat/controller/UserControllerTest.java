@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.NullAndEmptySource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.springframework.test.context.jdbc.Sql;
 
 import dev.rudrade.chat.ControllerIntegrationTest;
 import dev.rudrade.chat.dto.UserDto;
@@ -15,6 +16,7 @@ import dev.rudrade.chat.dto.response.LoginResponse;
 
 import static org.assertj.core.api.Assertions.*;
 
+@Sql("/sql-scripts/users.sql")
 class UserControllerTest extends ControllerIntegrationTest {
 
     //==========

@@ -51,6 +51,7 @@ export class Login {
         next: (res) => {
           this.submitting.set(false);
           this.authService.setToken(res.token);
+          this.authService.setCurrentUsername(username);
           this.router.navigate(['/']);
         },
         error: (err) => {
