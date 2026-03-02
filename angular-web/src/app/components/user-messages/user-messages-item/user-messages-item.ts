@@ -1,5 +1,5 @@
 import { Component, input } from '@angular/core';
-import { UserMessageItem } from '../../../models/user-message-item';
+import { MessageSummary } from '../../../models/message-summary';
 import { DatePipe } from '@angular/common';
 import { AvatarModule } from 'primeng/avatar';
 import { AvatarGroupModule } from 'primeng/avatargroup';
@@ -11,5 +11,5 @@ import { AvatarGroupModule } from 'primeng/avatargroup';
   styleUrl: './user-messages-item.css',
 })
 export class UserMessagesItem {
-  data = input.required<UserMessageItem>();
+  data = input.required<MessageSummary>();
 }

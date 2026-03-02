@@ -1,14 +1,24 @@
 <div class="grid grid-cols-1 gap-4 m-4">
   <h2 class="text-xl font-semibold mb-4 tracking-wider">Messages</h2>
   <p-floatLabel variant="on">
+    <!--TODO after: this sometimes the icon is not inside the input-->
     <p-iconfield>
       <p-inputicon class="fa-solid fa-magnifying-glass" />
       <label for="search">Search</label>
-      <input id="search" type="text" pInputText autocomplete="off" class="pr-4" fluid />
+      <input
+        id="search"
+        type="text"
+        pInputText
+        autocomplete="off"
+        class="pr-4"
+        fluid
+        (keyup)="onSearch($event)"
+        [(ngModel)]="searchTerm"
+      />
     </p-iconfield>
   </p-floatLabel>
   <div>
-    @for (message of messages(); track message.id) {
+    @for (message of messages(); track message.chatId) {
       <app-user-messages-item [data]="message" (click)="onUserClick(message)" />
     }
   </div>

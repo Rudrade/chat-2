@@ -8,25 +8,29 @@ import dev.rudrade.chat.model.User;
 import dev.rudrade.chat.repository.UserRepository;
 import dev.rudrade.chat.util.MapperUtil;
 import dev.rudrade.chat.util.ValidationUtil;
-import jakarta.validation.constraints.NotNull;
 import lombok.RequiredArgsConstructor;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional(readOnly = true)
 public class UserService {
 
     private final UserRepository repository;
     private final ValidationUtil validator;
     private final BCryptPasswordEncoder passwordEncoder;
 
-    public User findUser(@NotNull LoginRequest request) {
+    public User findUser(LoginRequest request) {
+        Objects.requireNonNull(request, "request must be provided to find user");
+
         // Validate input
         validator.validate(request);
 
@@ -43,12 +47,24 @@ public class UserService {
         return user.get();
     }
 
-    public Optional<User> findById(@NotNull UUID userId) {
-        return repository.findById(userId);
+    public Optional<User> findActiveById(UUID userId) {
+        Objects.requireNonNull(userId, "userId must be provided to find user");
+        var result = repository.findById(userId);
+        if (result.isPresent() && !result.get().isActive()) {
+            return Optional.empty();
+        }
+
+        return result;
     }
 
     public UserDto findDetails() {
         var user = repository.findDetails().orElseThrow(InvalidAccessException::new);
         return MapperUtil.userDto(user);
+    }
+
+    public List<User> findActiveByChat(UUID chatId) {
+        Objects.requireNonNull(chatId, "id must exist to get users");
+
+        return repository.findActiveByChatId(chatId);
     }
 }

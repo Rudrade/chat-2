@@ -7,12 +7,19 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.ControllerAdvice;
 import org.springframework.web.bind.annotation.ExceptionHandler;
 
+import jakarta.validation.ConstraintViolationException;
+
 import java.util.Set;
 
 @ControllerAdvice
 public class ControllerExceptionHandler {
 
     private static final Logger LOGGER = LoggerFactory.getLogger(ControllerExceptionHandler.class);
+
+    @ExceptionHandler(ConstraintViolationException.class)
+    ResponseEntity<Error> handleConstraintViolation(ConstraintViolationException ex) {
+        return handleInvalidData(new InvalidDataException(ex.getConstraintViolations()));
+    }
 
     @ExceptionHandler(Throwable.class)
     ResponseEntity<Error> handleThrowable(Throwable ex) {

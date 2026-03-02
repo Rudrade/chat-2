@@ -21,7 +21,6 @@ import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.List;
-import java.util.UUID;
 
 @Configuration
 @EnableWebSecurity
@@ -39,7 +38,7 @@ public class SecurityConfig {
         var configuration = new CorsConfiguration();
         configuration.setAllowedOrigins(allowedOrigins);
         configuration.setAllowedMethods(List.of("GET", "POST"));
-        configuration.setAllowedHeaders(List.of("Content-Type"));
+        configuration.setAllowedHeaders(List.of("Content-Type", "Authorization"));
 
         var source = new UrlBasedCorsConfigurationSource();
         source.registerCorsConfiguration("/**", configuration);
@@ -67,7 +66,7 @@ public class SecurityConfig {
 
     @Bean
     UserDetailsService userDetailsService() {
-        return id -> userRepository.findById(UUID.fromString(id))
+        return username -> userRepository.findByUsername(username)
             .orElseThrow(InvalidAccessException::new);
     }
 

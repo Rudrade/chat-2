@@ -1,5 +1,5 @@
 import { HttpClient } from '@angular/common/http';
-import { inject, Injectable, signal } from '@angular/core';
+import { inject, Injectable } from '@angular/core';
 import { Router } from '@angular/router';
 import { jwtDecode } from 'jwt-decode';
 
@@ -10,6 +10,7 @@ export class AuthService {
   private readonly route = inject(Router);
   private readonly httpClient = inject(HttpClient);
   private readonly keyStorage = 'sessionData';
+  private username?: string;
 
   login(username: string, password: string) {
     return this.httpClient.post<AuthResponse>('http://localhost:8080/chat/api/user/login', {
@@ -37,6 +38,14 @@ export class AuthService {
     sessionStorage.setItem(this.keyStorage, token);
   }
 
+  setCurrentUsername(username: string) {
+    this.username = username;
+  }
+
+  getCurrenUsername() {
+    return this.username;
+  }
+
   isUserAuthenticated() {
     const token = sessionStorage.getItem(this.keyStorage);
     if (!token) {
@@ -49,6 +58,13 @@ export class AuthService {
     }
 
     return decodedToken.exp * 1000 > Date.now();
+  }
+
+  getSubject() {
+    const token = this.getToken();
+    const decoded = jwtDecode(token!);
+
+    return decoded?.sub;
   }
 }
 
