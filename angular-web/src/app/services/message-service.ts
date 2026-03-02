@@ -30,12 +30,14 @@ export class MessageService {
   setCurrentChat(currentChat?: string) {
     console.log('changed to chat:', currentChat);
 
+    this.currentChat = currentChat;
+    this.messages.set([]);
+    this.messageCount.set(0);
+
     // Unsubscribe from previous connection if switching chats
     if (this.connectSubscription) {
       this.connectSubscription.unsubscribe();
     }
-
-    this.currentChat = currentChat;
 
     if (!this.currentChat) {
       return;
